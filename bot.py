@@ -1,12 +1,20 @@
 import telebot;
 from telebot import types
-bot = telebot.TeleBot("7986349365:AAFfrkvvLGKFdV84kGiulSMgO1iKKs4VMj0");
+import requests
+from gigachat import GigaChat
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
+
+bot = telebot.TeleBot(os.getenv('TELEGRAM_BOT_TOKEN'))
 
 
 
 name = '';
 surname = '';
 age = 0;
+
 
 
 def if_exist_gemorroy(message):
@@ -54,8 +62,13 @@ def start(message):
     if message.text == '/gemorroy':
         bot.send_message(message.from_user.id, "У вас что, гемоРРой??");
         bot.register_next_step_handler(message, if_exist_gemorroy);
+    elif message.text == '/start':
+        bot.send_message(message.from_user.id, "Добро пожаловать! Я АнтиГемороройAI Бот! Я объединяю людей в борьбе с геморроем! напиши /gemorroy")
     else:
-        bot.send_message(message.from_user.id, 'Напиши ./gemorroy')
+        with GigaChat(credentials=os.getenv('GIGACHAT_CREDENTIALS'), verify_ssl_certs=False) as giga:
+            response = giga.chat(message.text)
+            bot_response = response.choices[0].message.content
+        bot.send_message(message.chat.id, bot_response)
 
 @bot.callback_query_handler(func=lambda call: True)
 def callback_worker(call):
